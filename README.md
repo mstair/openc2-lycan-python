@@ -21,7 +21,7 @@ msg = json.dumps(cmd, cls=OpenC2MessageEncoder)
 
 # decode
 cmd = json.loads(msg, cls=OpenC2MessageDecoder)
-if cmd.action == openc2.DENY and cmd.target == openc2.IP_ADDR:
+if cmd.action == openc2.DENY and cmd.target == openc2.IPV4_NET:
     rule = iptc.Rule()
     rule.create_match(cmd.target.ipv4_net)
     rule.create_target("DROP")

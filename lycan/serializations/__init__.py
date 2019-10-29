@@ -30,7 +30,6 @@
 """
 
 import six, json
-from jsonschema import validate
 from lycan.message import *
 
 #todo:validate in/out against json schema
