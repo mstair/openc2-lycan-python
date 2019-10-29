@@ -1,7 +1,7 @@
 #
 #  The MIT License (MIT)
 #
-# Copyright 2018 AT&T Intellectual Property. All other rights reserved.
+# Copyright 2019 AT&T Intellectual Property. All other rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software
 # and associated documentation files (the "Software"), to deal in the Software without
@@ -30,34 +30,12 @@
 """
 
 import six, json
+from jsonschema import validate
 from lycan.message import *
 
-class OpenC2MessageEncoder(json.JSONEncoder):
+#todo:validate in/out against json schema
 
-    def _encode_message(self, obj, message):
-        if obj.header:
-            message["header"] = {}
-            header = obj.header
-            message["header"]["version"] = header.version
-            if header.id:
-                message["header"]["id"] = header.id
-            if header.created:
-                message["header"]["created"] = header.created
-            if header.sender:
-                message["header"]["sender"] = header.sender
-            message["header"]["content_type"] = header.content_type
-        if obj.body:
-            body = obj.body
-            if isinstance(body, OpenC2Command):
-                message["command"] = {}
-                self._encode_command(body, message["command"])
-            elif isinstance(body, OpenC2Response):
-                message["response"] = {}
-                self._encode_response(body, message["response"])
-            else:
-                raise ValueError("Invalid OpenC2 message")
-        else:
-            raise ValueError("Invalid OpenC2 message")
+class OpenC2MessageEncoder(json.JSONEncoder):
 
     def _encode_command(self, obj, message):
         message["action"] = obj.action
@@ -75,14 +53,14 @@ class OpenC2MessageEncoder(json.JSONEncoder):
             if obj.actuator.specifiers:
                 for (k, v) in six.iteritems(obj.actuator.specifiers):
                     message["actuator"][actuator][k] = v
-        if obj.id:
-            message["id"] = str(obj.id)
+        if obj.command_id:
+            message["command_id"] = str(obj.command_id)
         if obj.args:
             message["args"] = obj.args
 
     def _encode_response(self, obj, message):
-        message["id"] = str(obj.id)
-        message["id_ref"] = str(obj.id_ref)
+        if not obj.status:
+            raise ValueError("Invalid OpenC2 response: status required")
         message["status"] = obj.status
         if obj.status_text:
             message["status_text"] = obj.status_text
@@ -91,8 +69,6 @@ class OpenC2MessageEncoder(json.JSONEncoder):
 
     def default(self, obj):
         message = {}
-        if isinstance(obj, OpenC2Message):
-            self._encode_message(obj, message)
         if isinstance(obj, OpenC2Command):
             self._encode_command(obj, message)
         if isinstance(obj, OpenC2Response):
@@ -102,27 +78,6 @@ class OpenC2MessageEncoder(json.JSONEncoder):
 class OpenC2MessageDecoder(json.JSONDecoder):
     def __init__(self, *args, **kwargs):
         json.JSONDecoder.__init__(self, object_hook=self.object_hook, *args, **kwargs)
-
-    def _decode_message(self, obj):
-        header = self._decode_header(obj["header"])
-        if "command" in obj:
-           body = obj["command"]
-        elif "response" in obj:
-           body = obj["response"]
-        else:
-           raise ValueError("Invalid OpenC2 message")
-        return OpenC2Message(header, body)
-
-    def _decode_header(self, obj):
-        if "version" not in obj:
-            raise ValueError("Invalid OpenC2 header: version required")
-        if "content_type" not in obj:
-            raise ValueError("Invalid OpenC2 header: content_type required")
-        return OpenC2Header(obj["version"],
-                            obj["command_id"] if "command_id" in obj else None,
-                            obj["created"] if "created" in obj else None,
-                            obj["sender"] if "sender" in obj else None,
-                            obj["content_type"] if "content_type" in obj else None)
 
     def _decode_command(self, obj):
         if "target" not in obj:
@@ -141,27 +96,21 @@ class OpenC2MessageDecoder(json.JSONDecoder):
             actuator_name = list(obj["actuator"].keys())[0]
             actuator_specifiers = list(obj["actuator"].values())[0]
             actuator = OpenC2Actuator(actuator_name, **actuator_specifiers)
-        return OpenC2Command(obj["action"], target,
-                             obj["id"] if "id" in obj else None,
-                             actuator, OpenC2Args(obj["args"]) if "args" in obj else None)
+        return OpenC2Command(obj["action"], target, 
+                             OpenC2Args(obj["args"]) if "args" in obj else {},
+                             actuator, obj["command_id"] if "command_id" in obj else None)
 
     def _decode_response(self, obj):
-        if "id" not in obj:
-            raise ValueError("Invalid OpenC2 response: id required")
-        if "id_ref" not in obj:
-            raise ValueError("Invalid OpenC2 response: id_ref required")
         if "status" not in obj:
             raise ValueError("Invalid OpenC2 response: status required")
-        return OpenC2Response(obj["id"], obj["id_ref"], obj["status"],
+        return OpenC2Response(obj["status"],
                               obj["status_text"] if "status_text" in obj else None,
                               obj["results"] if "results" in obj else None)
 
     def object_hook(self, obj):
-        if "header" in obj:
-            message = self._decode_message(obj)
-        elif "action" in obj:
+        if "action" in obj:
             message = self._decode_command(obj)
-        elif "id_ref" in obj:
+        elif "status" in obj:
             message = self._decode_response(obj)
         else:
             message = obj

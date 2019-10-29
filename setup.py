@@ -1,7 +1,7 @@
 #
 #  The MIT License (MIT)
 #
-# Copyright 2018 AT&T Intellectual Property. All other rights reserved.
+# Copyright 2019 AT&T Intellectual Property. All other rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software
 # and associated documentation files (the "Software"), to deal in the Software without
@@ -37,5 +37,6 @@ setup(
     long_description=open('README.md').read(),
     install_requires=[
         'six',
+        'munch'
     ],
 )

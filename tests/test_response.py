@@ -1,7 +1,7 @@
 #
 #  The MIT License (MIT)
 #
-# Copyright 2018 AT&T Intellectual Property. All other rights reserved.
+# Copyright 2019 AT&T Intellectual Property. All other rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software
 # and associated documentation files (the "Software"), to deal in the Software without
@@ -28,8 +28,6 @@ class TestOpenC2Response(unittest.TestCase):
         pass
     def tearDown(self):
         pass
-    def test_init_fail(self):
-        self.assertRaises(TypeError, OpenC2Response, 'network-firewall')
     def test_init(self):
-        x = OpenC2Response('test-1', 'cmd-1', 200, 'passed', 'foo')
-        self.assertEqual(x.id, 'test-1')
+        x = OpenC2Response(200, 'passed', 'foo')
+        self.assertEqual(x.status, 200)

@@ -1,7 +1,7 @@
 #
 #  The MIT License (MIT)
 #
-# Copyright 2018 AT&T Intellectual Property. All other rights reserved.
+# Copyright 2019 AT&T Intellectual Property. All other rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software
 # and associated documentation files (the "Software"), to deal in the Software without
@@ -30,27 +30,20 @@
 """
 
 import six
+from munch import Munch, DefaultFactoryMunch, unmunchify
 
-__version__ = '0.1.0'
+__version__ = '1.0.0'
 
-class AttributeDict(dict):
-    """Support accessing dictionary elements as attributes"""
-    def __getattr__(self, k):
-        if k not in self:
-            return None
-        return self[k]
-    def __setattr__(self, k, v):
-        self[k] = v
-    def __delattr__(self, k):
-        if k in self:
-            del self[k]
+class OpenC2Specifiers(DefaultFactoryMunch):
+    def __init__(self, *args, **kwargs):
+        super(OpenC2Specifiers, self).__init__(Munch, *args, **kwargs)
 
 class OpenC2CommandField(object):
     """Base Class for Command Target/Actuator
 
     Attributes:
         _name (str): target/actuator name
-        _specifiers (AttributeDict, optional): target/actuator specifiers
+        _specifiers (Munch, optional): target/actuator specifiers
 
     Raises:
         TypeError: If required `name` is missing
@@ -67,8 +60,8 @@ class OpenC2CommandField(object):
                 if k == self._name:
                     self._specifiers = v
                 else:
-                    self._specifiers = AttributeDict()
-                    setattr(self._specifiers, k, v)
+                    self._specifiers = OpenC2Specifiers({k:v})
+                    #setattr(self._specifiers, k, v)
             else:
                 setattr(self._specifiers, k, v)
 
@@ -89,4 +82,4 @@ class OpenC2CommandField(object):
     @property
     def specifiers(self):
         """dict: Specifiers dictionary"""
-        return self._specifiers
+        return unmunchify(self._specifiers)

@@ -1,7 +1,7 @@
 #
 #  The MIT License (MIT)
 #
-# Copyright 2018 AT&T Intellectual Property. All other rights reserved.
+# Copyright 2019 AT&T Intellectual Property. All other rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software
 # and associated documentation files (the "Software"), to deal in the Software without
@@ -22,7 +22,7 @@
 
 import unittest,json
 import lycan.datamodels as openc2
-from lycan.message import OpenC2Command, OpenC2Response, OpenC2Target, OpenC2Actuator, OpenC2Header, OpenC2Message
+from lycan.message import OpenC2Command, OpenC2Response, OpenC2Target, OpenC2Actuator
 from lycan.serializations import OpenC2MessageDecoder
 
 class TestJsonDecode(unittest.TestCase):
@@ -35,8 +35,8 @@ class TestJsonDecode(unittest.TestCase):
     def test_command_decode(self):
         _msg = {
                'action': 'deny',
-					'target': {
-                   'ip_addr': '1.2.3.4'
+			   'target': {
+                   'ipv4_net': '1.2.3.4'
                },
                'actuator': {
                    'network_firewall': {
@@ -72,57 +72,9 @@ class TestJsonDecode(unittest.TestCase):
 
     def test_response_decode(self):
         _msg = {
-               'id': 'test1',
-               'id_ref': 'cmd1',
                'status': 200,
                'status_text':'passed',
                'results':'foo'
         }
         response = OpenC2MessageDecoder().decode(json.dumps(_msg))
-        self.assertEqual(response.id, 'test1')
-
-    def test_response_decode_invalid(self):
-        _msg = {
-               'id_ref': 'cmd1',
-               'status': 200,
-               'status_text':'passed',
-               'results':'foo'
-        }
-        cmd = OpenC2MessageDecoder()
-        self.assertRaises(ValueError, cmd.decode, json.dumps(_msg))
-
-    def test_message_decode(self):
-        _msg = {
-               'header': {
-                   'version': '0.1.0',
-                   'content_type': 'application/json'
-               },
-               'command': {
-                   'action':'deny',
-                   'target': {
-                       'ip_addr': '1.2.3.4'
-                   },
-                   'args': {
-                       'foo': 'bar'
-                   }
-              }
-        }
-        msg = OpenC2MessageDecoder().decode(json.dumps(_msg))
-        self.assertEqual(msg.body.action, 'deny')
-
-        _msg = {
-               'header': {
-                   'version': '0.1.0',
-                   'id': 'resp1',
-                   'created': 'now',
-                   'sender': 'firewall',
-                   'content_type': 'application/json'
-               },
-               'response': {
-                   'id': 'resp1',
-                   'id_ref': 'cmd1',
-                   'status': 200
-              }
-        }
-        msg = OpenC2MessageDecoder().decode(json.dumps(_msg))
-        self.assertEqual(msg.body.status, 200)
+        self.assertEqual(response.status, 200)

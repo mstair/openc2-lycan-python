@@ -1,7 +1,7 @@
 #
 #  The MIT License (MIT)
 #
-# Copyright 2018 AT&T Intellectual Property. All other rights reserved.
+# Copyright 2019 AT&T Intellectual Property. All other rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software
 # and associated documentation files (the "Software"), to deal in the Software without
@@ -22,7 +22,7 @@
 
 import unittest,json
 import lycan.datamodels as openc2
-from lycan.message import OpenC2Command, OpenC2Response, OpenC2Target, OpenC2Actuator, OpenC2Header, OpenC2Message
+from lycan.message import OpenC2Command, OpenC2Response, OpenC2Target, OpenC2Actuator
 from lycan.serializations import OpenC2MessageEncoder
 
 class TestJsonEncode(unittest.TestCase):
@@ -41,19 +41,19 @@ class TestJsonEncode(unittest.TestCase):
         _msg = {
                'action':'locate',
                'target': {
-                   'ip_addr': '1.2.3.4'
+                   'ipv4_net': '1.2.3.4'
                },
                'actuator': {
-                   'network_firewall': {
-                       'where': 'perimeter'
+                   'slpf': {
+                    'where':'perimeter'
                    }
                },
                'args': {
                    'foo': 'bar'
                }
         }
-        cmd = OpenC2Command(action=openc2.LOCATE, target=OpenC2Target(openc2.IP_ADDR, '1.2.3.4'),
-                            actuator=OpenC2Actuator(openc2.NETWORK_FIREWALL))
+        cmd = OpenC2Command(action=openc2.LOCATE, target=OpenC2Target(openc2.IPV4_NET, '1.2.3.4'),
+                            actuator=OpenC2Actuator(openc2.SLPF))
         cmd.actuator.where = 'perimeter'
         cmd.args.foo = 'bar'
         msg = OpenC2MessageEncoder().encode(cmd)
@@ -78,57 +78,10 @@ class TestJsonEncode(unittest.TestCase):
 
     def test_response_encode(self):
         _msg = {
-               'id': 'test1',
-               'id_ref': 'cmd1',
                'status': 200,
                'status_text':'passed',
                'results':'foo'
         }
-        x = OpenC2Response('test1', 'cmd1', 200, 'passed', 'foo')
+        x = OpenC2Response(200, 'passed', 'foo')
         msg = OpenC2MessageEncoder().encode(x)
         self.assertEqual(msg, OpenC2MessageEncoder().encode(_msg))
-
-    def test_message_encode_invalid(self):
-        msg = OpenC2Message(OpenC2Header())
-        cmd = OpenC2MessageEncoder()
-        self.assertRaises(ValueError, cmd.encode, msg)
-
-    def test_message_encode(self):
-        _msg = {
-               'header': {
-                   'version': '0.1.0',
-                   'content_type': 'application/json'
-               },
-               'command': {
-                   'action':'deny',
-                   'target': {
-                       'ip_addr': '1.2.3.4'
-                   },
-                   'args': {
-                       'foo': 'bar'
-                   }
-              }
-        }
-        hdr = OpenC2Header()
-        body = OpenC2Command(action=openc2.DENY, target=OpenC2Target(openc2.IP_ADDR, '1.2.3.4'), args={'foo':'bar'})
-        msg = OpenC2Message(hdr, body)
-        self.assertEqual(OpenC2MessageEncoder().encode(msg), OpenC2MessageEncoder().encode(_msg))
-
-        _msg = {
-               'header': {
-                   'version': '0.1.0',
-                   'id': 'resp1',
-                   'created': 'now',
-                   'sender': 'firewall',
-                   'content_type': 'application/json'
-               },
-               'response': {
-                   'id': 'resp1',
-                   'id_ref': 'cmd1',
-                   'status': 200
-              }
-        }
-        hdr = OpenC2Header(id='resp1', created='now', sender='firewall')
-        body = OpenC2Response('resp1', 'cmd1', 200)
-        msg = OpenC2Message(hdr, body)
-        self.assertEqual(OpenC2MessageEncoder().encode(msg), OpenC2MessageEncoder().encode(_msg))
