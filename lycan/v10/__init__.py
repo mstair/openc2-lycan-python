@@ -1,4 +1,4 @@
-from lycan.message import Command, Response
+from .message import Command, Response
 
 from .targets import (
     Artifact, Device, DomainName, EmailAddress, Features, File,
@@ -6,6 +6,8 @@ from .targets import (
     IPv6AddressRange, IPv4Connection, IPv6Connection, IRI, MacAddress, Process,
     Properties, URI
 )
+
+from .actuators import SLPF
 
 OBJ_MAP = {
     'command': Command,
@@ -30,5 +32,9 @@ OBJ_MAP_TARGET = {
     'process': Process,
     'properties': Properties,
     'uri': URI
+}
+
+OBJ_MAP_ACTUATOR = {
+    'slpf': SLPF
 }
 

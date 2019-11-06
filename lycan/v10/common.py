@@ -20,17 +20,15 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 
-"""
-.. module: lycan
-    :platform: Unix
+from lycan.base import _OpenC2DataType
 
-.. version:: $$VERSION$$
-.. moduleauthor:: Michael Stair <mstair@att.com>
+class Payload(_OpenC2DataType):
+    _type = 'payload'
+    _properties = OrderedDict([
+        ('bin', properties.BinaryProperty()),
+        ('url', properties.StringProperty())
+    ])
 
-"""
-
-from .v10 import *
-from .core import _collect_openc2_mappings, parse, parse_target
-from .version import __version__
-
-_collect_openc2_mappings()
+    def _check_object_constraints(self):
+        super(Payload, self)._check_object_constraints()
+        self._check_mutually_exclusive_properties(['bin', 'url'])

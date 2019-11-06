@@ -20,17 +20,28 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 
-"""
-.. module: lycan
-    :platform: Unix
+from stix2 import properties
+from lycan.base import _Actuator
+from lycan.custom import _custom_actuator_builder
 
-.. version:: $$VERSION$$
-.. moduleauthor:: Michael Stair <mstair@att.com>
+import itertools
+from collections import OrderedDict
 
-"""
+class SLPF(_Actuator):
+    _type = 'slpf'
+    _properties = OrderedDict([
+        ('hostname', properties.StringProperty()),
+        ('named_group', properties.StringProperty()),
+        ('asset_id', properties.StringProperty()),
+        ('asset_tuple', properties.StringProperty()),
+    ])
 
-from .v10 import *
-from .core import _collect_openc2_mappings, parse, parse_target
-from .version import __version__
+def CustomActuator(type='x-acme', properties=None):
+    def wrapper(cls):
+        _properties = list(itertools.chain.from_iterable([
+            [x for x in properties if not x[0].startswith('x_')],
+            sorted([x for x in properties if x[0].startswith('x_')], key=lambda x: x[0]),
+        ]))
+        return _custom_actuator_builder(cls, type, _properties, '2.1')
 
-_collect_openc2_mappings()
+    return wrapper

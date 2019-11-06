@@ -32,8 +32,8 @@
 from stix2.properties import (
     EnumProperty, DictionaryProperty, IntegerProperty, StringProperty
 )
-from .properties import TargetProperty
-from .base import _OpenC2Base
+from ..properties import TargetProperty
+from ..base import _OpenC2Base
 
 from collections import OrderedDict
 

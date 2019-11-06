@@ -31,180 +31,169 @@
 
 from stix2 import properties
 from lycan.properties import PayloadProperty
-from lycan.base import CustomOpenC2Object, _Target, _SimpleTarget
+from lycan.base import _Target
+from lycan.custom import _custom_target_builder
 
+import itertools
 from collections import OrderedDict
 
-@CustomOpenC2Object('artifact', [
-    ('mime_type', properties.StringProperty()),
-    ('payload', PayloadProperty()),
-    ('hashes', properties.HashesProperty()),
-])
 class Artifact(_Target):
+    _type = 'artifact'
+    _properties = OrderedDict([
+        ('mime_type', properties.StringProperty()),
+        ('payload', PayloadProperty()),
+        ('hashes', properties.HashesProperty()),
+    ])
+
     def _check_object_constraints(self):
         super(Artifact, self)._check_object_constraints()
         self._check_mutually_exclusive_properties(['payload', 'url'])
 
-@CustomOpenC2Object('device', [
-    ('hostname', properties.StringProperty()),
-    ('idn_hostname', properties.StringProperty()),
-    ('device_id', properties.StringProperty())
-])
 class Device(_Target):
-    pass
+    _type = 'device'
+    _properties = OrderedDict([
+        ('hostname', properties.StringProperty()),
+        ('idn_hostname', properties.StringProperty()),
+        ('device_id', properties.StringProperty())
+    ])
 
-@CustomOpenC2Object('domain_name', [
-    ('domain_name', properties.StringProperty(required=True)),
-])
-class DomainName(_SimpleTarget):
-    pass
+class DomainName(_Target):
+    _type = 'domain_name'
+    _properties = OrderedDict([
+        ('domain_name', properties.StringProperty(required=True)),
+    ])
 
-@CustomOpenC2Object('email_addr', [
-    ('email_addr', properties.StringProperty(required=True)),
-])
 class EmailAddress(_Target):
-    pass
+    _type = 'email_addr'
+    _properties = OrderedDict([
+        ('email_addr', properties.StringProperty(required=True)),
+    ])
 
-@CustomOpenC2Object('features', [
-    ('features', properties.ListProperty(properties.StringProperty))
-])
 class Features(_Target): 
-    def __init__(self, features=None, **kwargs):
-        if len(features) > 10:
-            raise ValueError("Maximum of 10 features allowed")
-        for feature in features:
-            #check for x-
-            if feature not in ["versions", "profiles", "pairs", "rate_limit"]:
-                raise ValueError("%s is an unsupported feature")
+    _type = 'features'
+    _properties = OrderedDict([
+        ('features', properties.ListProperty(properties.StringProperty))
+    ])
+#    def __init__(self, features=None, **kwargs):
+#        if len(features) > 10:
+#            raise ValueError("Maximum of 10 features allowed")
+#        for feature in features:
+#            #check for x-
+#            if feature not in ["versions", "profiles", "pairs", "rate_limit"]:
+#                raise ValueError("%s is an unsupported feature")
 
-@CustomOpenC2Object('file', [
-    ('name', properties.StringProperty()),
-    ('path', properties.StringProperty()),
-    ('hashes', properties.HashesProperty())
-])
 class File(_Target): 
-    pass
+    _type = 'file'
+    _properties = OrderedDict([
+        ('name', properties.StringProperty()),
+        ('path', properties.StringProperty()),
+        ('hashes', properties.HashesProperty())
+    ])
 
-@CustomOpenC2Object('idn_domain_name', [
-    ('idn_domain_name', properties.StringProperty(required=True)),
-])
 class InternationalizedDomainName(_Target):
-    pass
+    _type = 'idn_domain_name'
+    _properties = OrderedDict([
+        ('idn_domain_name', properties.StringProperty(required=True)),
+    ])
 
-@CustomOpenC2Object('idn_email', [
-    ('idn_email', properties.StringProperty(required=True)),
-])
 class InternationalizedEmailAddress(_Target):
-    pass
+    _type = 'idn_email'
+    _properties = OrderedDict([
+        ('idn_email', properties.StringProperty(required=True)),
+    ])
 
-@CustomOpenC2Object('ipv4_net', [
-    ('ipv4_net', properties.StringProperty(required=True)),
-])
 class IPv4AddressRange(_Target):
-    pass
+    _type = 'ipv4_net'
+    _properties = OrderedDict([
+        ('ipv4_net', properties.StringProperty(required=True)),
+    ])
 
-@CustomOpenC2Object('ipv6_net', [
-    ('ipv6_net', properties.StringProperty(required=True)),
-])
 class IPv6AddressRange(_Target):
-    pass
+    _type = 'ipv6_net'
+    _properties = OrderedDict([
+        ('ipv6_net', properties.StringProperty(required=True)),
+    ])
 
-#@CustomOpenC2Object('ipv4_connection', [
-#    ('src_addr', properties.StringProperty()),
-#    ('src_port', properties.StringProperty()),
-#    ('dst_addr', properties.StringProperty()),
-#    ('dst_port', properties.StringProperty()),
-#    ('protocol', properties.EnumProperty(
-#        allowed=[
-#            "icmp",
-#            "tcp",
-#            "udp",
-#            "sctp"
-#        ]
-#    ))
-#])
-#class IPv4Connection(_Target):
-#    pass
+class IPv4Connection(_Target):
+    _type = 'ipv4_connection'
+    _properties = OrderedDict([
+        ('src_addr', properties.StringProperty()),
+        ('src_port', properties.IntegerProperty(min=0, max=65535)),
+        ('dst_addr', properties.StringProperty()),
+        ('dst_port', properties.IntegerProperty(min=0, max=65535)),
+        ('protocol', properties.EnumProperty(
+            allowed=[
+                "icmp",
+                "tcp",
+                "udp",
+                "sctp"
+            ]
+        ))
+    ])
+
+class IPv6Connection(_Target):
+    _type = 'ipv6_connection'
+    _properties = OrderedDict([
+        ('src_addr', properties.StringProperty()),
+        ('src_port', properties.IntegerProperty(min=0, max=65535)),
+        ('dst_addr', properties.StringProperty()),
+        ('dst_port', properties.IntegerProperty(min=0, max=65535)),
+        ('protocol', properties.EnumProperty(
+            allowed=[
+                "icmp",
+                "tcp",
+                "udp",
+                "sctp"
+            ]
+        ))
+    ])
 #    def __init__(self, src_port=None, dst_port=None, **kwargs):
 #        if src_port and (src_port < 0 or src_port > 65535):
 #            raise ValueError("invalid src_port")
 #        if dst_port and (dst_port < 0 or dst_port > 65535):
 #            raise ValueError("invalid dst_port")
-class IPv4Connection(_Target):
-    _type = 'ipv4_connection'
+
+class IRI(_Target):
+    _type = 'iri'
     _properties = OrderedDict([
-    ('src_addr', properties.StringProperty()),
-    ('src_port', properties.StringProperty()),
-    ('dst_addr', properties.StringProperty()),
-    ('dst_port', properties.StringProperty()),
-    ('protocol', properties.EnumProperty(
-        allowed=[
-            "icmp",
-            "tcp",
-            "udp",
-            "sctp"
-        ]
-    ))
+        ('iri', properties.StringProperty(required=True)),
     ])
 
-    def __init__(self, allow_custom=False, **kwargs):
-        super(IPv4Connection,self).__init__(allow_custom=False, **kwargs)
-        self._collapse = True
-
-@CustomOpenC2Object('ipv6_connection', [
-    ('src_addr', properties.StringProperty()),
-    ('src_port', properties.StringProperty()),
-    ('dst_addr', properties.StringProperty()),
-    ('dst_port', properties.StringProperty()),
-    ('protocol', properties.EnumProperty(
-        allowed=[
-            "icmp",
-            "tcp",
-            "udp",
-            "sctp"
-        ]
-    ))
-])
-class IPv6Connection(_Target):
-    def __init__(self, src_port=None, dst_port=None, **kwargs):
-        if src_port and (src_port < 0 or src_port > 65535):
-            raise ValueError("invalid src_port")
-        if dst_port and (dst_port < 0 or dst_port > 65535):
-            raise ValueError("invalid dst_port")
-
-@CustomOpenC2Object('iri', [
-    ('iri', properties.StringProperty(required=True)),
-])
-class IRI(_Target):
-    pass
-
-@CustomOpenC2Object('mac_addr', [
-    ('mac_addr', properties.StringProperty(required=True)),
-])
 class MacAddress(_Target):
-    pass
+    _type = 'mac_addr'
+    _properties = OrderedDict([
+        ('mac_addr', properties.StringProperty(required=True)),
+    ])
 
-@CustomOpenC2Object('process', [
-    ('pid', properties.StringProperty()),
-    ('name', properties.StringProperty()),
-    ('cmd', properties.StringProperty()),
-    ('executable', properties.StringProperty()),
-    ('executable', properties.StringProperty()),
-    ('parent', properties.StringProperty()),
-    ('command_line', properties.StringProperty()),
-])
 class Process(_Target):
-    #handle parent process
-    pass
+    _type = 'process'
+    _properties = OrderedDict([
+        ('pid', properties.StringProperty()),
+        ('name', properties.StringProperty()),
+        ('cmd', properties.StringProperty()),
+        ('executable', properties.StringProperty()),
+        ('parent', properties.StringProperty()), #handle parent process
+        ('command_line', properties.StringProperty()),
+    ])
 
-@CustomOpenC2Object('properties', [
-    ('properties', properties.StringProperty(required=True)),
-])
 class Properties(_Target):
-    pass
+    _type = 'properties'
+    _properties = OrderedDict([
+        ('properties', properties.StringProperty(required=True)),
+    ])
 
-@CustomOpenC2Object('uri', [
-    ('uri', properties.StringProperty(required=True)),
-])
 class URI(_Target):
-    pass
+    _type = 'uri'
+    _properties = OrderedDict([
+        ('uri', properties.StringProperty(required=True)),
+    ])
+
+def CustomTarget(type='x-acme', properties=None):
+    def wrapper(cls):
+        _properties = list(itertools.chain.from_iterable([
+            [x for x in properties if not x[0].startswith('x_')],
+            sorted([x for x in properties if x[0].startswith('x_')], key=lambda x: x[0]),
+        ]))
+        return _custom_target_builder(cls, type, _properties, '2.1')
+
+    return wrapper

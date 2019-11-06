@@ -138,8 +138,12 @@ def parse_target(data, allow_custom=False, version=None):
     # dict when passed a dict
     obj = copy.deepcopy(obj)
 
-    target_type = list(obj.keys())[0]
-    target_specifiers = list(obj.values())[0]
+    try:
+        target_type = list(obj.keys())[0]
+        target_specifiers = list(obj.values())[0]
+    except IndexError:
+        raise ParseError("Can't parse object that contains an invalid target: %s" % str(data))
+ 
 
     try:
         OBJ_MAP_TARGET = OPENC2_OBJ_MAPS['targets']
@@ -173,3 +177,4 @@ def _collect_openc2_mappings():
                 mod = importlib.import_module(name, str(top_level_module.__name__))
                 OPENC2_OBJ_MAPS['objects'] = mod.OBJ_MAP
                 OPENC2_OBJ_MAPS['targets'] = mod.OBJ_MAP_TARGET
+                OPENC2_OBJ_MAPS['actuators'] = mod.OBJ_MAP_ACTUATOR

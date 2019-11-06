@@ -33,19 +33,7 @@ from stix2 import properties
 from stix2.properties import Property, DictionaryProperty
 from stix2.utils import _get_dict
 from .core import parse_target
-from .base import _OpenC2Type 
 from collections import OrderedDict
-
-class Payload(_OpenC2Type):
-    _type = 'payload'
-    _properties = OrderedDict([
-        ('bin', properties.BinaryProperty()),
-        ('url', properties.StringProperty())
-    ])
-
-    def _check_object_constraints(self):
-        super(Payload, self)._check_object_constraints()
-        self._check_mutually_exclusive_properties(['bin', 'url'])
 
 class PayloadProperty(Property):
     pass
@@ -80,6 +68,7 @@ class TargetProperty(Property):
     def clean(self, value):
         dictified = {}
         try:
+            #carry along the target type
             dictified[value._type]= _get_dict(value)
         except ValueError:
             raise ValueError("This property may only contain a dictionary or object")
