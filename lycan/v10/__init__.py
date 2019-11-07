@@ -38,3 +38,8 @@ OBJ_MAP_ACTUATOR = {
     'slpf': SLPF
 }
 
+EXT_MAP = {
+    'targets': {},
+    'actuators': {},
+    'args': {}
+}

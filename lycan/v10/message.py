@@ -32,7 +32,7 @@
 from stix2.properties import (
     EnumProperty, DictionaryProperty, IntegerProperty, StringProperty
 )
-from ..properties import TargetProperty
+from ..properties import TargetProperty, ActuatorProperty
 from ..base import _OpenC2Base
 
 from collections import OrderedDict
@@ -66,7 +66,7 @@ class Command(_OpenC2Base):
         )),
         ('target', TargetProperty()),
         ('args', DictionaryProperty()),
-        ('actuator', DictionaryProperty()),
+        ('actuator', ActuatorProperty()),
         ('command_id', StringProperty())
     ])
 

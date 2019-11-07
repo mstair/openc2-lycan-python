@@ -147,11 +147,6 @@ class IPv6Connection(_Target):
             ]
         ))
     ])
-#    def __init__(self, src_port=None, dst_port=None, **kwargs):
-#        if src_port and (src_port < 0 or src_port > 65535):
-#            raise ValueError("invalid src_port")
-#        if dst_port and (dst_port < 0 or dst_port > 65535):
-#            raise ValueError("invalid dst_port")
 
 class IRI(_Target):
     _type = 'iri'

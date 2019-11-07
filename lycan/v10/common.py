@@ -21,6 +21,8 @@
 #
 
 from lycan.base import _OpenC2DataType
+from stix2 import properties
+from collections import OrderedDict
 
 class Payload(_OpenC2DataType):
     _type = 'payload'

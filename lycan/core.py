@@ -31,68 +31,15 @@ import re
 OPENC2_OBJ_MAPS = {}
 
 def parse(data, allow_custom=False, version=None):
-    """Convert a string, dict or file-like object into a OpenC2 object.
-
-    Args:
-        data (str, dict, file-like object): The STIX 2 content to be parsed.
-        allow_custom (bool): Whether to allow custom properties as well unknown
-            custom objects. Note that unknown custom objects cannot be parsed
-            into STIX objects, and will be returned as is. Default: False.
-        version (str): If present, it forces the parser to use the version
-            provided. Otherwise, the library will make the best effort based
-            on checking the "spec_version" property. If none of the above are
-            possible, it will use the default version specified by the library.
-
-    Returns:
-        An instantiated Python STIX object.
-
-    Warnings:
-        'allow_custom=True' will allow for the return of any supplied STIX
-        dict(s) that cannot be found to map to any known STIX object types
-        (both STIX2 domain objects or defined custom STIX2 objects); NO
-        validation is done. This is done to allow the processing of possibly
-        unknown custom STIX objects (example scenario: I need to query a
-        third-party TAXII endpoint that could provide custom STIX objects that
-        I don't know about ahead of time)
-
-    """
-    # convert STIX object to dict, if not already
+    # convert OpenC2 object to dict, if not already
     obj = _get_dict(data)
-    # convert dict to full python-stix2 obj
+    # convert dict to full python-openc2 obj
     obj = dict_to_openc2(obj, allow_custom, version)
 
     return obj
 
 
 def dict_to_openc2(openc2_dict, allow_custom=False, version=None):
-    """convert dictionary to full python-stix2 object
-
-    Args:
-        stix_dict (dict): a python dictionary of a STIX object
-            that (presumably) is semantically correct to be parsed
-            into a full python-stix2 obj
-        allow_custom (bool): Whether to allow custom properties as well
-            unknown custom objects. Note that unknown custom objects cannot
-            be parsed into STIX objects, and will be returned as is.
-            Default: False.
-        version (str): If present, it forces the parser to use the version
-            provided. Otherwise, the library will make the best effort based
-            on checking the "spec_version" property. If none of the above are
-            possible, it will use the default version specified by the library.
-
-    Returns:
-        An instantiated Python STIX object
-
-    Warnings:
-        'allow_custom=True' will allow for the return of any supplied STIX
-        dict(s) that cannot be found to map to any known STIX object types
-        (both STIX2 domain objects or defined custom STIX2 objects); NO
-        validation is done. This is done to allow the processing of
-        possibly unknown custom STIX objects (example scenario: I need to
-        query a third-party TAXII endpoint that could provide custom STIX
-        objects that I don't know about ahead of time)
-
-    """
     message_type = None
     if 'action' in openc2_dict:
         message_type = 'command'
@@ -114,54 +61,35 @@ def dict_to_openc2(openc2_dict, allow_custom=False, version=None):
 
     return obj_class(allow_custom=allow_custom, **openc2_dict)
 
+def parse_component(data, allow_custom=False, version=None, component_type=None):
 
-def parse_target(data, allow_custom=False, version=None):
-    """Deserialize a string or file-like object into a STIX Cyber Observable
-    object.
-
-    Args:
-        data (str, dict, file-like object): The STIX2 content to be parsed.
-        _valid_refs: A list of object references valid for the scope of the
-            object being parsed. Use empty list if no valid refs are present.
-        allow_custom (bool): Whether to allow custom properties or not.
-            Default: False.
-        version (str): If present, it forces the parser to use the version
-            provided. Otherwise, the default version specified by the library
-            will be used.
-
-    Returns:
-        An instantiated Python STIX Cyber Observable object.
-
-    """
     obj = _get_dict(data)
-    # modify the original dict as _get_dict() does not return new
-    # dict when passed a dict
     obj = copy.deepcopy(obj)
-
     try:
-        target_type = list(obj.keys())[0]
-        target_specifiers = list(obj.values())[0]
+        _type = list(obj.keys())[0]
+        _specifiers = list(obj.values())[0]
     except IndexError:
-        raise ParseError("Can't parse object that contains an invalid target: %s" % str(data))
- 
+        raise ParseError("Can't parse object that contains an invalid field: %s" % str(data))
 
     try:
-        OBJ_MAP_TARGET = OPENC2_OBJ_MAPS['targets']
-        obj_class = OBJ_MAP_TARGET[target_type]
+        OBJ_MAP = OPENC2_OBJ_MAPS[component_type]
+        obj_class = OBJ_MAP[_type]
     except KeyError:
-        if allow_custom:
-            # flag allows for unknown custom objects too, but will not
-            # be parsed into STIX observable object, just returned as is
-            return obj
-        raise CustomContentError("Can't parse unknown observable type '%s'! For custom observables, "
-                                 "use the CustomObservable decorator." % target_type)
-
-    #handle targets with single value specifiers
-    if isinstance(target_specifiers, dict):
-        obj = obj[target_type]
+        # check for extension
+        try:
+            EXT_MAP = OPENC2_OBJ_MAPS["extensions"]
+            obj_class = EXT_MAP[component_type][_type]
+        except KeyError:
+            if allow_custom:
+                # flag allows for unknown custom objects too, but will not
+                # be parsed into STIX observable object, just returned as is
+                return obj
+            raise CustomContentError("Can't parse unknown observable type '%s'! For custom observables, "
+                                 "use the CustomObservable decorator." % _type)
+    if isinstance(_specifiers, dict):
+        obj = obj[_type]
 
     return obj_class(allow_custom=allow_custom, **obj)
-
 
 def _collect_openc2_mappings():
     """Navigate the package once and retrieve all object mapping dicts for each
@@ -178,3 +106,4 @@ def _collect_openc2_mappings():
                 OPENC2_OBJ_MAPS['objects'] = mod.OBJ_MAP
                 OPENC2_OBJ_MAPS['targets'] = mod.OBJ_MAP_TARGET
                 OPENC2_OBJ_MAPS['actuators'] = mod.OBJ_MAP_ACTUATOR
+                OPENC2_OBJ_MAPS['extensions'] = mod.EXT_MAP

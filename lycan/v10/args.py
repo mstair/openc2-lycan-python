@@ -20,42 +20,35 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 
-"""
-.. module: lycan.base
-    :platform: Unix
+from stix2 import properties
+from lycan.base import _OpenC2Base
+from lycan.custom import _custom_args_extension_builder
 
-.. version:: $$VERSION$$
-.. moduleauthor:: Michael Stair <mstair@att.com>
+import itertools
+from collections import OrderedDict
 
-"""
+class Args(_OpenC2Base):
+    _type = 'args'
+    _properties = OrderedDict([
+        ('start_time', properties.IntegerProperty()),
+        ('stop_time', properties.IntegerProperty()),
+        ('duration', properties.IntegerProperty()),
+        ('response_requested', properties.EnumProperty(
+            allowed=[
+                "none",
+                "ack",
+                "status",
+                "complete"
+            ] 
+        ))
+    ])
 
-from stix2.base import _cls_init, _STIXBase, STIXJSONEncoder
+def CustomArgsExtension(type='x-acme', properties=None):
+    def wrapper(cls):
+        _properties = list(itertools.chain.from_iterable([
+            [x for x in properties if not x[0].startswith('x_')],
+            sorted([x for x in properties if x[0].startswith('x_')], key=lambda x: x[0]),
+        ]))
+        return _custom_args_extension_builder(cls, type, _properties, '2.1')
 
-import copy
-import json
-
-class OpenC2JSONEncoder(STIXJSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, _OpenC2Base):
-            tmp_obj = dict(copy.deepcopy(obj))
-            #collapse targets with a single specifier (ie, DomainName)
-            if len(obj._properties) == 1 and obj._type in obj._properties.keys():
-                tmp_obj = tmp_obj.get(obj._type)
-            return {obj._type:tmp_obj}
-        else:
-            return super(OpenC2JSONEncoder, self).default(obj)
-
-class _OpenC2Base(_STIXBase):
-    def serialize(self, pretty=False, **kwargs):
-        if pretty:
-            kwargs.update({'indent': 4, 'separators': (',', ': ')})
-        return json.dumps(self, cls=OpenC2JSONEncoder, **kwargs)
-
-class _OpenC2DataType(_OpenC2Base):
-    pass
-
-class _Target(_OpenC2Base):
-    pass
-
-class _Actuator(_OpenC2Base):
-    pass
+    return wrapper

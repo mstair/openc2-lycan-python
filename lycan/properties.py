@@ -32,10 +32,14 @@
 from stix2 import properties
 from stix2.properties import Property, DictionaryProperty
 from stix2.utils import _get_dict
-from .core import parse_target
+from .base import _OpenC2Base
+from .core import parse_component
 from collections import OrderedDict
 
 class PayloadProperty(Property):
+    pass
+
+class ProcessProperty(Property):
     pass
 
 HASHES_REGEX = {
@@ -59,20 +63,38 @@ class HashesProperty(DictionaryProperty):
                     del clean_dict[k]
         return clean_dict
 
-class TargetProperty(Property):
+class ComponentProperty(Property):
 
     def __init__(self, allow_custom=False, *args, **kwargs):
+        super(ComponentProperty, self).__init__(*args, **kwargs)
         self.allow_custom = allow_custom
-        super(TargetProperty, self).__init__(*args, **kwargs)
+        self._component_type = None
 
     def clean(self, value):
+        if not self._component_type:
+            raise ValueError("This property requires a component type")
+
         dictified = {}
         try:
-            #carry along the target type
-            dictified[value._type]= _get_dict(value)
+            if isinstance(value, _OpenC2Base):
+                dictified[value._type]= _get_dict(value)
+            else:
+                dictified = _get_dict(value)
         except ValueError:
             raise ValueError("This property may only contain a dictionary or object")
-        if dictified[value._type]== {}:
-            raise ValueError("This property may only contain a non-empty dictionary or object")
-        parsed_obj = parse_target(dictified, allow_custom=self.allow_custom)
+        #if dictified[value._type]== {}:
+        #    raise ValueError("This property may only contain a non-empty dictionary or object")
+        parsed_obj = parse_component(dictified, allow_custom=self.allow_custom, component_type=self._component_type)
         return parsed_obj
+
+class TargetProperty(ComponentProperty):
+    def __init__(self, allow_custom=False, *args, **kwargs):
+        super(TargetProperty, self).__init__(allow_custom, *args, **kwargs)
+        self.allow_custom = allow_custom
+        self._component_type = "targets"
+
+class ActuatorProperty(ComponentProperty):
+    def __init__(self, allow_custom=False, *args, **kwargs):
+        super(ActuatorProperty, self).__init__(allow_custom, *args, **kwargs)
+        self.allow_custom = allow_custom
+        self._component_type = "actuators"
