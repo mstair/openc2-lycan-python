@@ -91,29 +91,6 @@ def parse_component(data, allow_custom=False, version=None, component_type=None)
 
     return obj_class(allow_custom=allow_custom, **obj)
 
-#def parse_args(data, allow_custom=False, version=None):
-#    obj = _get_dict(data)
-#    obj = copy.deepcopy(obj)
-#    print("parse",data)
-#    try:
-#        OBJ_MAP = OPENC2_OBJ_MAPS["args"]
-#        obj_class = OBJ_MAP["args"]
-#    except KeyError:
-#        # check for extension
-#        try:
-#            EXT_MAP = OPENC2_OBJ_MAPS["extensions"]
-#            print("extmap",EXT_MAP)
-#            obj_class = EXT_MAP["args"]["args"]
-#        except KeyError:
-#            if allow_custom:
-#                # flag allows for unknown custom objects too, but will not
-#                # be parsed into STIX observable object, just returned as is
-#                return obj
-#            raise CustomContentError("Can't parse unknown observable type '%s'! For custom observables, "
-#                                 "use the CustomObservable decorator." % _type)
-#
-#    return obj_class(allow_custom=allow_custom, **obj)
-
 def _register_extension(new_type, object_type, version=None):
     EXT_MAP = OPENC2_OBJ_MAPS['extensions']
     EXT_MAP[object_type][new_type._type] = new_type

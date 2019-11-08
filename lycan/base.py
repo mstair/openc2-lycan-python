@@ -30,7 +30,6 @@
 """
 
 from stix2.base import _cls_init, _STIXBase, STIXJSONEncoder
-
 import copy
 import json
 
@@ -38,18 +37,28 @@ class OpenC2JSONEncoder(STIXJSONEncoder):
     def default(self, obj):
         if isinstance(obj, _OpenC2Base):
             tmp_obj = dict(copy.deepcopy(obj))
-            #collapse targets with a single specifier (ie, DomainName)
-            if len(obj._properties) == 1 and obj._type in obj._properties.keys():
-                tmp_obj = tmp_obj.get(obj._type)
-            return {obj._type:tmp_obj}
+            if isinstance(obj, (_Target, _Actuator)):
+                #collapse targets with a single specifier (ie, DomainName)
+                if len(obj._inner) == 1 and obj._type in obj._inner:
+                    tmp_obj = tmp_obj.get(obj._type)
+                #yes, this is a shameful hack for process recursion, revisit
+                #if obj._type == 'parent':
+                #    return tmp_obj
+                return {obj._type:tmp_obj}
+            else:
+                return tmp_obj
         else:
             return super(OpenC2JSONEncoder, self).default(obj)
 
 class _OpenC2Base(_STIXBase):
+    def __init__(self, allow_custom=False, **kwargs):
+        super(_OpenC2Base, self).__init__(allow_custom, **kwargs)
+        self._encoder = OpenC2JSONEncoder
+
     def serialize(self, pretty=False, **kwargs):
         if pretty:
             kwargs.update({'indent': 4, 'separators': (',', ': ')})
-        return json.dumps(self, cls=OpenC2JSONEncoder, **kwargs)
+        return json.dumps(self, cls=self._encoder, **kwargs)
 
 class _OpenC2DataType(_OpenC2Base):
     pass

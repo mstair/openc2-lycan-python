@@ -22,7 +22,7 @@
 
 from stix2 import properties
 from lycan.base import _OpenC2Base
-from lycan.custom import _custom_args_extension_builder
+from lycan.custom import _custom_args_builder
 
 import itertools
 from collections import OrderedDict
@@ -49,6 +49,6 @@ def CustomArgs(type='x-acme', properties=None):
             [x for x in properties if not x[0].startswith('x_')],
             sorted([x for x in properties if x[0].startswith('x_')], key=lambda x: x[0]),
         ]))
-        return _custom_args_extension_builder(cls, type, _properties, '2.1')
+        return _custom_args_builder(cls, type, _properties, '2.1')
 
     return wrapper

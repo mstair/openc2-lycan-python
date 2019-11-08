@@ -35,17 +35,25 @@ from stix2.utils import _get_dict
 from .base import _OpenC2Base
 from .core import parse_component
 from collections import OrderedDict
+import re
 
 class PayloadProperty(Property):
     pass
 
 class ProcessProperty(Property):
     pass
+#    def clean(self, value):
+#        #see OpenC2JSON encoder in .base for corresponding unfortunate hack
+#        #to handle recursive process parents. punted after attempting to
+#        #override in a process specific encoder
+#        if isinstance(value, _OpenC2Base):
+#            value._type = 'parent'
+#        return value
 
 HASHES_REGEX = {
-    "MD5": (r"^[a-fA-F0-9]{32}$", "MD5"),
-    "SHA1": (r"^[a-fA-F0-9]{40}$", "SHA-1"),
-    "SHA256": (r"^[a-fA-F0-9]{64}$", "SHA-256"),
+    "md5": (r"^[a-fA-F0-9]{32}$", "md5"),
+    "sha1": (r"^[a-fA-F0-9]{40}$", "sha1"),
+    "sha256": (r"^[a-fA-F0-9]{64}$", "sha256"),
 }
 
 class HashesProperty(DictionaryProperty):
@@ -53,14 +61,15 @@ class HashesProperty(DictionaryProperty):
     def clean(self, value):
         clean_dict = super(HashesProperty, self).clean(value)
         for k, v in clean_dict.items():
-            key = k.upper().replace('-', '')
-            if key in HASHES_REGEX:
-                vocab_key = HASHES_REGEX[key][1]
-                if not re.match(HASHES_REGEX[key][0], v):
+            if k in HASHES_REGEX:
+                vocab_key = HASHES_REGEX[k][1]
+                if not re.match(HASHES_REGEX[k][0], v):
                     raise ValueError("'{0}' is not a valid {1} hash".format(v, vocab_key))
                 if k != vocab_key:
                     clean_dict[vocab_key] = clean_dict[k]
                     del clean_dict[k]
+            else:
+                raise ValueError("'{1}' is not a valid hash".format(v, k))
         return clean_dict
 
 class ComponentProperty(Property):

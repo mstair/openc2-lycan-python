@@ -32,6 +32,7 @@ OBJ_MAP_TARGET = {
     'iri': IRI,
     'mac_addr': MacAddress,
     'process': Process,
+    'parent': Process,
     'properties': Properties,
     'uri': URI
 }

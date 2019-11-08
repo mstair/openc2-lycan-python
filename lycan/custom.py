@@ -53,8 +53,8 @@ def _custom_actuator_builder(cls, type, properties, version):
     _register_extension(_CustomActuator, object_type="actuators", version=version)
     return _CustomActuator
 
-def _custom_args_extension_builder(cls, type, properties, version):
-    class _CustomArgsExtension(cls, _OpenC2Base):
+def _custom_args_builder(cls, type, properties, version):
+    class _CustomArgs(cls, _OpenC2Base):
 
         if not properties or not isinstance(properties, list):
             raise ValueError("Must supply a list, containing tuples. For example, [('property1', IntegerProperty())]")
@@ -66,5 +66,5 @@ def _custom_args_extension_builder(cls, type, properties, version):
             _OpenC2Base.__init__(self, **kwargs)
             _cls_init(cls, self, kwargs)
 
-    _register_extension(_CustomArgsExtension, object_type="args", version=version)
-    return _CustomArgsExtension
+    _register_extension(_CustomArgs, object_type="args", version=version)
+    return _CustomArgs

@@ -23,6 +23,7 @@
 from lycan.base import _OpenC2DataType
 from stix2 import properties
 from collections import OrderedDict
+from lycan.properties import ProcessProperty
 
 class Payload(_OpenC2DataType):
     _type = 'payload'
@@ -34,3 +35,18 @@ class Payload(_OpenC2DataType):
     def _check_object_constraints(self):
         super(Payload, self)._check_object_constraints()
         self._check_mutually_exclusive_properties(['bin', 'url'])
+    
+class Parent(_OpenC2DataType):
+    _type = 'parent'
+    _properties = OrderedDict([
+        ('pid', properties.StringProperty()),
+        ('name', properties.StringProperty()),
+        ('cmd', properties.StringProperty()),
+        ('executable', properties.StringProperty()),
+        ('parent', ProcessProperty()),
+        ('command_line', properties.StringProperty()),
+    ])
+
+    def _check_object_constraints(self):
+        super(Parent, self)._check_object_constraints()
+        self._check_at_least_one_property()

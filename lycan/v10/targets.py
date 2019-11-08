@@ -30,11 +30,12 @@
 """
 
 from stix2 import properties
-from lycan.properties import PayloadProperty
-from lycan.base import _Target
+from lycan.properties import PayloadProperty, HashesProperty, ProcessProperty
+from lycan.base import _Target, OpenC2JSONEncoder
 from lycan.custom import _custom_target_builder
 
 import itertools
+import copy
 from collections import OrderedDict
 
 class Artifact(_Target):
@@ -42,12 +43,12 @@ class Artifact(_Target):
     _properties = OrderedDict([
         ('mime_type', properties.StringProperty()),
         ('payload', PayloadProperty()),
-        ('hashes', properties.HashesProperty()),
+        ('hashes', HashesProperty()),
     ])
 
     def _check_object_constraints(self):
         super(Artifact, self)._check_object_constraints()
-        self._check_mutually_exclusive_properties(['payload', 'url'])
+        self._check_at_least_one_property()
 
 class Device(_Target):
     _type = 'device'
@@ -87,8 +88,12 @@ class File(_Target):
     _properties = OrderedDict([
         ('name', properties.StringProperty()),
         ('path', properties.StringProperty()),
-        ('hashes', properties.HashesProperty())
+        ('hashes', HashesProperty())
     ])
+
+    def _check_object_constraints(self):
+        super(File, self)._check_object_constraints()
+        self._check_at_least_one_property()
 
 class InternationalizedDomainName(_Target):
     _type = 'idn_domain_name'
@@ -131,6 +136,10 @@ class IPv4Connection(_Target):
         ))
     ])
 
+    def _check_object_constraints(self):
+        super(IPv4Connection, self)._check_object_constraints()
+        self._check_at_least_one_property()
+
 class IPv6Connection(_Target):
     _type = 'ipv6_connection'
     _properties = OrderedDict([
@@ -147,6 +156,10 @@ class IPv6Connection(_Target):
             ]
         ))
     ])
+
+    def _check_object_constraints(self):
+        super(IPv6Connection, self)._check_object_constraints()
+        self._check_at_least_one_property()
 
 class IRI(_Target):
     _type = 'iri'
@@ -167,14 +180,21 @@ class Process(_Target):
         ('name', properties.StringProperty()),
         ('cmd', properties.StringProperty()),
         ('executable', properties.StringProperty()),
-        ('parent', properties.StringProperty()), #handle parent process
+        ('parent', ProcessProperty()),
         ('command_line', properties.StringProperty()),
     ])
+
+    def __init__(self, allow_custom=False, **kwargs):
+        super(Process, self).__init__(allow_custom, **kwargs)
+
+    def _check_object_constraints(self):
+        super(Process, self)._check_object_constraints()
+        self._check_at_least_one_property()
 
 class Properties(_Target):
     _type = 'properties'
     _properties = OrderedDict([
-        ('properties', properties.StringProperty(required=True)),
+        ('properties', properties.ListProperty(properties.StringProperty)),
     ])
 
 class URI(_Target):
