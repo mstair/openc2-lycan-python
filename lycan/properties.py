@@ -73,7 +73,6 @@ class ComponentProperty(Property):
     def clean(self, value):
         if not self._component_type:
             raise ValueError("This property requires a component type")
-
         dictified = {}
         try:
             if isinstance(value, _OpenC2Base):
@@ -98,3 +97,6 @@ class ActuatorProperty(ComponentProperty):
         super(ActuatorProperty, self).__init__(allow_custom, *args, **kwargs)
         self.allow_custom = allow_custom
         self._component_type = "actuators"
+
+class ArgsProperty(DictionaryProperty):
+    pass

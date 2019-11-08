@@ -7,6 +7,8 @@ from .targets import (
     Properties, URI
 )
 
+from .args import Args
+
 from .actuators import SLPF
 
 OBJ_MAP = {
@@ -36,6 +38,10 @@ OBJ_MAP_TARGET = {
 
 OBJ_MAP_ACTUATOR = {
     'slpf': SLPF
+}
+
+OBJ_MAP_ARGS = {
+    'args': Args
 }
 
 EXT_MAP = {

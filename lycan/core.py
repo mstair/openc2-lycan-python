@@ -91,6 +91,33 @@ def parse_component(data, allow_custom=False, version=None, component_type=None)
 
     return obj_class(allow_custom=allow_custom, **obj)
 
+#def parse_args(data, allow_custom=False, version=None):
+#    obj = _get_dict(data)
+#    obj = copy.deepcopy(obj)
+#    print("parse",data)
+#    try:
+#        OBJ_MAP = OPENC2_OBJ_MAPS["args"]
+#        obj_class = OBJ_MAP["args"]
+#    except KeyError:
+#        # check for extension
+#        try:
+#            EXT_MAP = OPENC2_OBJ_MAPS["extensions"]
+#            print("extmap",EXT_MAP)
+#            obj_class = EXT_MAP["args"]["args"]
+#        except KeyError:
+#            if allow_custom:
+#                # flag allows for unknown custom objects too, but will not
+#                # be parsed into STIX observable object, just returned as is
+#                return obj
+#            raise CustomContentError("Can't parse unknown observable type '%s'! For custom observables, "
+#                                 "use the CustomObservable decorator." % _type)
+#
+#    return obj_class(allow_custom=allow_custom, **obj)
+
+def _register_extension(new_type, object_type, version=None):
+    EXT_MAP = OPENC2_OBJ_MAPS['extensions']
+    EXT_MAP[object_type][new_type._type] = new_type
+
 def _collect_openc2_mappings():
     """Navigate the package once and retrieve all object mapping dicts for each
     v2X package. Includes OBJ_MAP, OBJ_MAP_OBSERVABLE, EXT_MAP."""
@@ -105,5 +132,6 @@ def _collect_openc2_mappings():
                 mod = importlib.import_module(name, str(top_level_module.__name__))
                 OPENC2_OBJ_MAPS['objects'] = mod.OBJ_MAP
                 OPENC2_OBJ_MAPS['targets'] = mod.OBJ_MAP_TARGET
+                OPENC2_OBJ_MAPS['args'] = mod.OBJ_MAP_ARGS
                 OPENC2_OBJ_MAPS['actuators'] = mod.OBJ_MAP_ACTUATOR
                 OPENC2_OBJ_MAPS['extensions'] = mod.EXT_MAP

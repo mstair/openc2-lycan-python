@@ -43,7 +43,7 @@ class Args(_OpenC2Base):
         ))
     ])
 
-def CustomArgsExtension(type='x-acme', properties=None):
+def CustomArgs(type='x-acme', properties=None):
     def wrapper(cls):
         _properties = list(itertools.chain.from_iterable([
             [x for x in properties if not x[0].startswith('x_')],

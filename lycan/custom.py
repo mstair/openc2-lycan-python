@@ -2,14 +2,7 @@ from collections import OrderedDict
 
 from stix2.base import _cls_init
 from .base import _OpenC2Base, _Target, _Actuator
-from .core import OPENC2_OBJ_MAPS
-
-def _register_extension(new_type, object_type=None, version=None):
-    #if not object_type:
-        #raise
-
-    EXT_MAP = OPENC2_OBJ_MAPS['extensions']
-    EXT_MAP[object_type][new_type._type] = new_type
+from .core import OPENC2_OBJ_MAPS, _register_extension
 
 def _custom_target_builder(cls, type, properties, version):
     class _CustomTarget(cls, _Target):
