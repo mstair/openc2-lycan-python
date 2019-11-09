@@ -20,23 +20,29 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 
-import re,ast
 from distutils.core import setup
 from setuptools import find_packages
 
-_version_re = re.compile(r'__version__\s+=\s+(.*)')
-with open('lycan/__init__.py', 'rb') as f:
-    VERSION = str(ast.literal_eval(_version_re.search(
-                    f.read().decode('utf-8')).group(1)))
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+VERSION_FILE = os.path.join(BASE_DIR, 'openc2', 'version.py')
+
+def get_version():
+    with open(VERSION_FILE) as f:
+        for line in f.readlines():
+            if line.startswith('__version__'):
+                version = line.split()[-1].strip('"')
+                return version
+        raise AttributeError("Package does not have a __version__")
+
 setup(
     name='lycan',
-    version=VERSION,
+    version=version,
     packages=find_packages(exclude=["tests"]),
     license='MIT',
     include_package_data=True,
     long_description=open('README.md').read(),
     install_requires=[
         'six',
-        'munch'
+        'stix2'
     ],
 )
