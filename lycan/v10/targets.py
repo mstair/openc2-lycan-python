@@ -75,13 +75,17 @@ class Features(_Target):
     _properties = OrderedDict([
         ('features', properties.ListProperty(properties.StringProperty))
     ])
-#    def __init__(self, features=None, **kwargs):
-#        if len(features) > 10:
-#            raise ValueError("Maximum of 10 features allowed")
-#        for feature in features:
-#            #check for x-
-#            if feature not in ["versions", "profiles", "pairs", "rate_limit"]:
-#                raise ValueError("%s is an unsupported feature")
+
+    def _check_object_constraints(self):
+        super(Features, self)._check_object_constraints()
+        self._check_at_least_one_property()
+        if 'features' in self._inner:
+            features = self._inner['features']
+            if len(features) > 10:
+                raise ValueError("Maximum of 10 features allowed")
+            for feature in features:
+                if feature not in ["versions", "profiles", "pairs", "rate_limit"]:
+                    raise ValueError("%s unsupported feature")
 
 class File(_Target): 
     _type = 'file'
@@ -107,13 +111,13 @@ class InternationalizedEmailAddress(_Target):
         ('idn_email', properties.StringProperty(required=True)),
     ])
 
-class IPv4AddressRange(_Target):
+class IPv4Address(_Target):
     _type = 'ipv4_net'
     _properties = OrderedDict([
         ('ipv4_net', properties.StringProperty(required=True)),
     ])
 
-class IPv6AddressRange(_Target):
+class IPv6Address(_Target):
     _type = 'ipv6_net'
     _properties = OrderedDict([
         ('ipv6_net', properties.StringProperty(required=True)),
@@ -167,7 +171,7 @@ class IRI(_Target):
         ('iri', properties.StringProperty(required=True)),
     ])
 
-class MacAddress(_Target):
+class MACAddress(_Target):
     _type = 'mac_addr'
     _properties = OrderedDict([
         ('mac_addr', properties.StringProperty(required=True)),
@@ -190,6 +194,8 @@ class Process(_Target):
     def _check_object_constraints(self):
         super(Process, self)._check_object_constraints()
         self._check_at_least_one_property()
+        if self.get('parent'):
+            self._inner['parent'] = dict(self.get('parent'))
 
 class Properties(_Target):
     _type = 'properties'

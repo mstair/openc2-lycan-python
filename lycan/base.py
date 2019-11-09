@@ -39,7 +39,8 @@ class OpenC2JSONEncoder(STIXJSONEncoder):
             tmp_obj = dict(copy.deepcopy(obj))
             if isinstance(obj, (_Target, _Actuator)):
                 #collapse targets with a single specifier (ie, DomainName)
-                if len(obj._inner) == 1 and obj._type in obj._inner:
+                #if len(obj._inner) == 1 and obj._type in obj._inner:
+                if len(obj._properties) == 1 and obj._type in obj._propeties.keys():
                     tmp_obj = tmp_obj.get(obj._type)
                 #yes, this is a shameful hack for process recursion, revisit
                 #if obj._type == 'parent':

@@ -2,8 +2,8 @@ from .message import Command, Response
 
 from .targets import (
     Artifact, Device, DomainName, EmailAddress, Features, File,
-    InternationalizedDomainName, InternationalizedEmailAddress, IPv4AddressRange,
-    IPv6AddressRange, IPv4Connection, IPv6Connection, IRI, MacAddress, Process,
+    InternationalizedDomainName, InternationalizedEmailAddress, IPv4Address,
+    IPv6Address, IPv4Connection, IPv6Connection, IRI, MACAddress, Process,
     Properties, URI
 )
 
@@ -25,14 +25,13 @@ OBJ_MAP_TARGET = {
     'file': File,
     'idn_domain_name': InternationalizedDomainName,
     'idn_email': InternationalizedEmailAddress,
-    'ipv4_net': IPv4AddressRange,
-    'ipv6_net': IPv6AddressRange,
+    'ipv4_net': IPv4Address,
+    'ipv6_net': IPv6Address,
     'ipv4_connection': IPv4Connection,
     'ipv6_connection': IPv6Connection,
     'iri': IRI,
-    'mac_addr': MacAddress,
+    'mac_addr': MACAddress,
     'process': Process,
-    'parent': Process,
     'properties': Properties,
     'uri': URI
 }
