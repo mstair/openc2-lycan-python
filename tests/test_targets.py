@@ -1,4 +1,4 @@
-import lycan 
+import openc2
 import pytest
 
 import stix2.exceptions
