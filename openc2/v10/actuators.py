@@ -21,34 +21,27 @@
 #
 
 from stix2 import properties
-from lycan.base import _OpenC2Base
-from lycan.custom import _custom_args_builder
+from ..base import _Actuator
+from ..custom import _custom_actuator_builder
 
 import itertools
 from collections import OrderedDict
 
-class Args(_OpenC2Base):
-    _type = 'args'
+class SLPF(_Actuator):
+    _type = 'slpf'
     _properties = OrderedDict([
-        ('start_time', properties.IntegerProperty()),
-        ('stop_time', properties.IntegerProperty()),
-        ('duration', properties.IntegerProperty()),
-        ('response_requested', properties.EnumProperty(
-            allowed=[
-                "none",
-                "ack",
-                "status",
-                "complete"
-            ] 
-        ))
+        ('hostname', properties.StringProperty()),
+        ('named_group', properties.StringProperty()),
+        ('asset_id', properties.StringProperty()),
+        ('asset_tuple', properties.StringProperty()),
     ])
 
-def CustomArgs(type='x-acme', properties=None):
+def CustomActuator(type='x-acme', properties=None):
     def wrapper(cls):
         _properties = list(itertools.chain.from_iterable([
             [x for x in properties if not x[0].startswith('x_')],
             sorted([x for x in properties if x[0].startswith('x_')], key=lambda x: x[0]),
         ]))
-        return _custom_args_builder(cls, type, _properties, '2.1')
+        return _custom_actuator_builder(cls, type, _properties, '2.1')
 
     return wrapper

@@ -99,7 +99,7 @@ def _collect_openc2_mappings():
     """Navigate the package once and retrieve all object mapping dicts for each
     v2X package. Includes OBJ_MAP, OBJ_MAP_OBSERVABLE, EXT_MAP."""
     if not OPENC2_OBJ_MAPS:
-        top_level_module = importlib.import_module('lycan')
+        top_level_module = importlib.import_module('openc2')
         path = top_level_module.__path__
         prefix = str(top_level_module.__name__) + '.'
 

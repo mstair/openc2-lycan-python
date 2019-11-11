@@ -20,10 +20,10 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 
-from lycan.base import _OpenC2DataType
 from stix2 import properties
 from collections import OrderedDict
-from lycan.properties import ProcessProperty
+from ..base import _OpenC2DataType
+from ..properties import ProcessProperty
 
 class Payload(_OpenC2DataType):
     _type = 'payload'

@@ -3,12 +3,12 @@
 [![Build Status](https://travis-ci.org/oasis-open/openc2-lycan-python.svg)](https://travis-ci.org/open-oasis/openc2-lycan-python)
 [![Coverage Status](https://coveralls.io/repos/github/oasis-open/openc2-lycan-python/badge.svg)](https://coveralls.io/github/oasis-open/openc2-lycan-python)
 
-Lycan is an implementation of the OpenC2 OASIS standard for command and control messaging. The current implementation is based on CSD04.
+Lycan is an implementation of the OpenC2 OASIS standard for command and control messaging. The current implementation is based on the Language Specification v1.0.
 
 ## Usage
 
 ```python
-import uuid, json, iptc
+import json, iptc
 import lycan.datamodels as openc2
 from lycan.message import OpenC2Command, OpenC2Response, OpenC2Target, OpenC2Args
 from lycan.serializations import OpenC2MessageEncoder, OpenC2MessageDecoder
@@ -29,6 +29,13 @@ if cmd.action == openc2.DENY and cmd.target == openc2.IPV4_NET:
     if cmd.args.response_requested == 'complete':
         resp = OpenC2Response(200)
         msg = json.dumps(resp, cls=OpenC2MessageEncoder)
+
+
+# extended profile
+cmd = OpenC2Command(action=openc2.DENY,
+                    target=OpenC2Target("x-acme:foo", 'bar'),
+                    args=OpenC2Args(response_requested='complete'))
+msg = json.dumps(cmd, cls=OpenC2MessageEncoder)
 ```
 
 <div>

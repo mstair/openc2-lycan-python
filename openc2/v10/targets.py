@@ -21,7 +21,7 @@
 #
 
 """
-.. module: lycan.targets
+.. module: openc2.targets
     :platform: Unix
 
 .. version:: $$VERSION$$
@@ -30,9 +30,9 @@
 """
 
 from stix2 import properties
-from lycan.properties import PayloadProperty, HashesProperty, ProcessProperty
-from lycan.base import _Target, OpenC2JSONEncoder
-from lycan.custom import _custom_target_builder
+from ..properties import PayloadProperty, HashesProperty, ProcessProperty
+from ..base import _Target, OpenC2JSONEncoder
+from ..custom import _custom_target_builder
 
 import itertools
 import copy

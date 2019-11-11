@@ -21,7 +21,7 @@
 #
 
 """
-.. module: lycan.message
+.. module: openc2.message
     :platform: Unix
 
 .. version:: $$VERSION$$

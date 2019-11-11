@@ -37,7 +37,7 @@ def get_version():
 
 setup(
     name='lycan',
-    version=version,
+    version=get_version(),
     packages=find_packages(exclude=["tests"]),
     license='MIT',
     include_package_data=True,
