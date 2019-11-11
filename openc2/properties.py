@@ -42,13 +42,9 @@ class PayloadProperty(Property):
 
 class ProcessProperty(Property):
     pass
-#    def clean(self, value):
-#        #see OpenC2JSON encoder in .base for corresponding unfortunate hack
-#        #to handle recursive process parents. punted after attempting to
-#        #override in a process specific encoder
-#        if isinstance(value, _OpenC2Base):
-#            value._type = 'parent'
-#        return value
+
+class FileProperty(Property):
+    pass
 
 HASHES_REGEX = {
     "md5": (r"^[a-fA-F0-9]{32}$", "md5"),

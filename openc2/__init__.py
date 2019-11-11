@@ -30,7 +30,7 @@
 """
 
 from .v10 import *
-from .core import _collect_openc2_mappings, parse
+from .core import _collect_openc2_mappings, parse, parse_target, parse_actuator
 from .version import __version__
 
 _collect_openc2_mappings()

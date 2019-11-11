@@ -91,6 +91,12 @@ def parse_component(data, allow_custom=False, version=None, component_type=None)
 
     return obj_class(allow_custom=allow_custom, **obj)
 
+def parse_target(data, allow_custom=False, version=None):
+    return parse_component(data, allow_custom, version, component_type="targets")
+
+def parse_actuator(data, allow_custom=False, version=None):
+    return parse_component(data, allow_custom, version, component_type="actuators")
+
 def _register_extension(new_type, object_type, version=None):
     EXT_MAP = OPENC2_OBJ_MAPS['extensions']
     EXT_MAP[object_type][new_type._type] = new_type
@@ -105,7 +111,7 @@ def _collect_openc2_mappings():
 
         for module_loader, name, is_pkg in pkgutil.walk_packages(path=path, prefix=prefix):
             ver = name.split('.')[1]
-            if re.match(r'^lycan\.v1[0-9]$', name) and is_pkg:
+            if re.match(r'openc2\.v1[0-9]$', name) and is_pkg:
                 mod = importlib.import_module(name, str(top_level_module.__name__))
                 OPENC2_OBJ_MAPS['objects'] = mod.OBJ_MAP
                 OPENC2_OBJ_MAPS['targets'] = mod.OBJ_MAP_TARGET

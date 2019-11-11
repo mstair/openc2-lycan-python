@@ -30,7 +30,7 @@
 """
 
 from stix2 import properties
-from ..properties import PayloadProperty, HashesProperty, ProcessProperty
+from ..properties import PayloadProperty, HashesProperty, ProcessProperty, FileProperty
 from ..base import _Target, OpenC2JSONEncoder
 from ..custom import _custom_target_builder
 
@@ -180,10 +180,10 @@ class MACAddress(_Target):
 class Process(_Target):
     _type = 'process'
     _properties = OrderedDict([
-        ('pid', properties.StringProperty()),
+        ('pid', properties.IntegerProperty()),
         ('name', properties.StringProperty()),
         ('cmd', properties.StringProperty()),
-        ('executable', properties.StringProperty()),
+        ('executable', FileProperty()),
         ('parent', ProcessProperty()),
         ('command_line', properties.StringProperty()),
     ])

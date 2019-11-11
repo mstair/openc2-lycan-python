@@ -4,12 +4,14 @@ from .targets import (
     Artifact, Device, DomainName, EmailAddress, Features, File,
     InternationalizedDomainName, InternationalizedEmailAddress, IPv4Address,
     IPv6Address, IPv4Connection, IPv6Connection, IRI, MACAddress, Process,
-    Properties, URI
+    Properties, URI, CustomTarget
 )
 
-from .args import Args
+from .common import Payload
 
-from .actuators import SLPF
+from .args import Args, CustomArgs
+
+from .actuators import SLPF, CustomActuator
 
 OBJ_MAP = {
     'command': Command,
