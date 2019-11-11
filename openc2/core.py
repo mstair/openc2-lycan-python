@@ -20,6 +20,15 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 
+"""
+.. module: openc2.core
+    :platform: Unix
+
+.. version:: $$VERSION$$
+.. moduleauthor:: Michael Stair <mstair@att.com>
+
+"""
+
 from stix2.utils import _get_dict
 from stix2.exceptions import CustomContentError, ParseError
 
@@ -38,7 +47,6 @@ def parse(data, allow_custom=False, version=None):
 
     return obj
 
-
 def dict_to_openc2(openc2_dict, allow_custom=False, version=None):
     message_type = None
     if 'action' in openc2_dict:
@@ -49,13 +57,10 @@ def dict_to_openc2(openc2_dict, allow_custom=False, version=None):
         raise ParseError("Can't parse object that is not valid command or response: %s" % str(openc2_dict))
 
     OBJ_MAP = OPENC2_OBJ_MAPS['objects']
-
     try:
         obj_class = OBJ_MAP[message_type]
     except KeyError:
         if allow_custom:
-            # flag allows for unknown custom objects too, but will not
-            # be parsed into STIX object, returned as is
             return openc2_dict
         raise ParseError("Can't parse unknown object type '%s'! For custom types, use the CustomObject decorator." % openc2_dict['type'])
 
@@ -81,8 +86,6 @@ def parse_component(data, allow_custom=False, version=None, component_type=None)
             obj_class = EXT_MAP[component_type][_type]
         except KeyError:
             if allow_custom:
-                # flag allows for unknown custom objects too, but will not
-                # be parsed into STIX observable object, just returned as is
                 return obj
             raise CustomContentError("Can't parse unknown observable type '%s'! For custom observables, "
                                  "use the CustomObservable decorator." % _type)
@@ -102,8 +105,6 @@ def _register_extension(new_type, object_type, version=None):
     EXT_MAP[object_type][new_type._type] = new_type
 
 def _collect_openc2_mappings():
-    """Navigate the package once and retrieve all object mapping dicts for each
-    v2X package. Includes OBJ_MAP, OBJ_MAP_OBSERVABLE, EXT_MAP."""
     if not OPENC2_OBJ_MAPS:
         top_level_module = importlib.import_module('openc2')
         path = top_level_module.__path__

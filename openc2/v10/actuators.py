@@ -20,6 +20,15 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 
+"""
+.. module: openc2.v10.actuators
+    :platform: Unix
+
+.. version:: $$VERSION$$
+.. moduleauthor:: Michael Stair <mstair@att.com>
+
+"""
+
 from stix2 import properties
 from ..base import _Actuator
 from ..custom import _custom_actuator_builder

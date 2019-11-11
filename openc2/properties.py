@@ -21,7 +21,7 @@
 #
 
 """
-.. module: lycan.properties
+.. module: openc2.properties
     :platform: Unix
 
 .. version:: $$VERSION$$
@@ -34,6 +34,7 @@ from stix2.properties import Property, DictionaryProperty
 from stix2.utils import _get_dict
 from .base import _OpenC2Base
 from .core import parse_component
+from .v10.common import Payload
 from collections import OrderedDict
 import re
 
@@ -53,7 +54,6 @@ HASHES_REGEX = {
 }
 
 class HashesProperty(DictionaryProperty):
-
     def clean(self, value):
         clean_dict = super(HashesProperty, self).clean(value)
         for k, v in clean_dict.items():
@@ -69,7 +69,6 @@ class HashesProperty(DictionaryProperty):
         return clean_dict
 
 class ComponentProperty(Property):
-
     def __init__(self, allow_custom=False, *args, **kwargs):
         super(ComponentProperty, self).__init__(*args, **kwargs)
         self.allow_custom = allow_custom
@@ -86,8 +85,6 @@ class ComponentProperty(Property):
                 dictified = _get_dict(value)
         except ValueError:
             raise ValueError("This property may only contain a dictionary or object")
-        #if dictified[value._type]== {}:
-        #    raise ValueError("This property may only contain a non-empty dictionary or object")
         parsed_obj = parse_component(dictified, allow_custom=self.allow_custom, component_type=self._component_type)
         return parsed_obj
 

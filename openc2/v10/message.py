@@ -21,7 +21,7 @@
 #
 
 """
-.. module: openc2.message
+.. module: openc2.v10.message
     :platform: Unix
 
 .. version:: $$VERSION$$

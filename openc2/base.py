@@ -21,7 +21,7 @@
 #
 
 """
-.. module: lycan.base
+.. module: openc2.base
     :platform: Unix
 
 .. version:: $$VERSION$$

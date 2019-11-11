@@ -21,7 +21,7 @@
 #
 
 """
-.. module: openc2.targets
+.. module: openc2.v10.targets
     :platform: Unix
 
 .. version:: $$VERSION$$
