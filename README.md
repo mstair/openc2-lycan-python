@@ -5,37 +5,44 @@
 
 Lycan is an implementation of the OpenC2 OASIS standard for command and control messaging. The current implementation is based on the Language Specification v1.0.
 
+Given the influence of STIX/CyBoX on OpenC2, this library extends the [STIX 2 Python API](https://github.com/oasis-open/cti-python-stix2) internals. Property validation and object extension support aligns with STIX2 conventions.
+
 ## Usage
 
 ```python
-import json, iptc
-import lycan.datamodels as openc2
-from lycan.message import OpenC2Command, OpenC2Response, OpenC2Target, OpenC2Args
-from lycan.serializations import OpenC2MessageEncoder, OpenC2MessageDecoder
+import iptc
+from openc2 import parse, IPv4Address, Command, Response, Args
 
 # encode
-cmd = OpenC2Command(action=openc2.DENY,
-                    target=OpenC2Target(openc2.IPV4_NET, '1.2.3.4'),
-                    args=OpenC2Args(response_requested='complete'))
-msg = json.dumps(cmd, cls=OpenC2MessageEncoder)
+cmd = Command(action = "deny",
+              target = IPv4Address(ipv4_net = "1.2.3.4"),
+              args = Args(response_requested = "complete"))
+msg = cmd.serialize()
 
 # decode
-cmd = json.loads(msg, cls=OpenC2MessageDecoder)
-if cmd.action == openc2.DENY and cmd.target == openc2.IPV4_NET:
+cmd = parse(msg)
+if cmd.action == "deny" and cmd.target.type == "ipv4_net":
     rule = iptc.Rule()
     rule.create_match(cmd.target.ipv4_net)
     rule.create_target("DROP")
 
-    if cmd.args.response_requested == 'complete':
-        resp = OpenC2Response(200)
-        msg = json.dumps(resp, cls=OpenC2MessageEncoder)
+    if cmd.args["response_requested"] == 'complete':
+        resp = Response(status=200)
+        msg = resp.serialize()
 
+# custom actuator
+from openc2 import CustomActuator
+from stix2 import properties
+@CustomActuator('x-acme-widget', [
+    ('name', properties.StringProperty(required=True)),
+    ('version', properties.FloatProperty())
+])
+class AcmeWidgetActuator(object):
+    def __init__(self, version=None, **kwargs):
+        if version and version < 1.0:
+            raise ValueError("'%f' is not a supported version." % version)
 
-# extended profile
-cmd = OpenC2Command(action=openc2.DENY,
-                    target=OpenC2Target("x-acme:foo", 'bar'),
-                    args=OpenC2Args(response_requested='complete'))
-msg = json.dumps(cmd, cls=OpenC2MessageEncoder)
+widget = AcmeWidgetActuator(name="foo", version=1.1)
 ```
 
 <div>
