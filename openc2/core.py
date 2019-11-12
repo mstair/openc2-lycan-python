@@ -87,8 +87,7 @@ def parse_component(data, allow_custom=False, version=None, component_type=None)
         except KeyError:
             if allow_custom:
                 return obj
-            raise CustomContentError("Can't parse unknown observable type '%s'! For custom observables, "
-                                 "use the CustomObservable decorator." % _type)
+            raise CustomContentError("Can't parse unknown target/actuator type '%s'!" % _type)
     if isinstance(_specifiers, dict):
         obj = obj[_type]
 

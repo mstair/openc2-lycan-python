@@ -62,19 +62,18 @@ class Command(_OpenC2Base):
                 "copy",
                 "investigate",
                 "remediate"
-            ]
+            ], required=True
         )),
-        ('target', TargetProperty()),
+        ('target', TargetProperty(required=True)),
         ('args', ArgsProperty()),
         ('actuator', ActuatorProperty()),
         ('command_id', StringProperty())
     ])
 
 class Response(_OpenC2Base):
-
     _type = 'response'
     _properties = OrderedDict([
-        ('status', IntegerProperty()),
+        ('status', IntegerProperty(required=True)),
         ('status_text', StringProperty()),
         ('results', DictionaryProperty()),
     ])

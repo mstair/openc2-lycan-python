@@ -47,6 +47,7 @@ class ProcessProperty(Property):
 class FileProperty(Property):
     pass
 
+#openc2 1.0 spec only supports md5, sha1, sha256
 HASHES_REGEX = {
     "md5": (r"^[a-fA-F0-9]{32}$", "md5"),
     "sha1": (r"^[a-fA-F0-9]{40}$", "sha1"),

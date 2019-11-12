@@ -29,7 +29,7 @@
 
 """
 
-from stix2.base import _cls_init, _STIXBase, STIXJSONEncoder
+from stix2.base import _STIXBase, STIXJSONEncoder
 import copy
 import json
 
@@ -39,12 +39,9 @@ class OpenC2JSONEncoder(STIXJSONEncoder):
             tmp_obj = dict(copy.deepcopy(obj))
             if isinstance(obj, (_Target, _Actuator)):
                 #collapse targets with a single specifier (ie, DomainName)
-                #if len(obj._inner) == 1 and obj._type in obj._inner:
-                if len(obj._properties) == 1 and obj._type in obj._propeties.keys():
+                if len(obj._properties) == 1 and obj._type in obj._properties.keys():
                     tmp_obj = tmp_obj.get(obj._type)
-                #yes, this is a shameful hack for process recursion, revisit
-                #if obj._type == 'parent':
-                #    return tmp_obj
+                #for target/actuators, return type and specifiers dict
                 return {obj._type:tmp_obj}
             else:
                 return tmp_obj
@@ -54,12 +51,24 @@ class OpenC2JSONEncoder(STIXJSONEncoder):
 class _OpenC2Base(_STIXBase):
     def __init__(self, allow_custom=False, **kwargs):
         super(_OpenC2Base, self).__init__(allow_custom, **kwargs)
-        self._encoder = OpenC2JSONEncoder
 
     def serialize(self, pretty=False, **kwargs):
         if pretty:
             kwargs.update({'indent': 4, 'separators': (',', ': ')})
-        return json.dumps(self, cls=self._encoder, **kwargs)
+        return json.dumps(self, cls=OpenC2JSONEncoder, **kwargs)
+
+    #openc2 doesnt have 'type' properties in commands
+    def __getattr__(self, name):
+        if name == 'type':
+            return self._type
+        else:
+            return super(_OpenC2Base, self).__getattr__(name)
+
+    def __getitem__(self, key):
+        if key == 'type':
+            return self._type
+        else:
+            return super(_OpenC2Base, self).__getitem__(key)
 
 class _OpenC2DataType(_OpenC2Base):
     pass
