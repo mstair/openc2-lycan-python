@@ -115,6 +115,7 @@ def parse_args(data, allow_custom=False, version=None):
                     dictified[key] = cls(**subvalue)
                 else:
                     dictified[key] = cls(**subvalue)
+                    print(type(dictified[key]))
             elif type(subvalue) is cls:
                 # If already an instance of an _Extension class, assume it's valid
                 dictified[key] = subvalue

@@ -90,13 +90,13 @@ class ComponentProperty(Property):
         return parsed_obj
 
 class TargetProperty(ComponentProperty):
-    def __init__(self, allow_custom=True, *args, **kwargs):
+    def __init__(self, allow_custom=False, *args, **kwargs):
         super(TargetProperty, self).__init__(allow_custom, *args, **kwargs)
         self.allow_custom = allow_custom
         self._component_type = "targets"
 
 class ActuatorProperty(ComponentProperty):
-    def __init__(self, allow_custom=True, *args, **kwargs):
+    def __init__(self, allow_custom=False, *args, **kwargs):
         super(ActuatorProperty, self).__init__(allow_custom, *args, **kwargs)
         self.allow_custom = allow_custom
         self._component_type = "actuators"

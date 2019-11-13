@@ -99,9 +99,9 @@ class SLPF(_OpenC2Base):
 
     def _check_object_constraints(self):
         super(SLPF, self)._check_object_constraints()
-        if not isinstance(self.target, _Target) or not self.target._type \
+        if not isinstance(self.target, _Target) or not self.target.type \
                 in ['features', 'file', 'ipv4_net', 'ipv6_net', 'ipv4_connection', 
-                    'ipv6_connection', 'slpf:rule_number']:
-            raise ValueError("Unsupported target (%s)"%self.target._type)
-        if self.actuator and not self.actuator._type == 'slpf':
+                        'ipv6_connection', 'slpf:rule_number']:
+            raise ValueError("Unsupported target (%s)"%self.target)
+        if self.actuator and not isinstance(self.actuator, SLPFActuator):
             raise ValueError("Unsupported actuator (%s)"%self.actuator._type)
