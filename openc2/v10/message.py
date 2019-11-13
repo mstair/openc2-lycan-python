@@ -33,7 +33,7 @@ from stix2.properties import (
     EnumProperty, DictionaryProperty, IntegerProperty, StringProperty
 )
 from ..properties import TargetProperty, ActuatorProperty, ArgsProperty
-from ..base import _OpenC2Base
+from ..base import _OpenC2Base, _Target
 
 from collections import OrderedDict
 

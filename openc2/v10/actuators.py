@@ -29,21 +29,12 @@
 
 """
 
-from stix2 import properties
-from ..base import _Actuator
+#from stix2 import properties
+#from ..base import _Actuator
 from ..custom import _custom_actuator_builder
 
 import itertools
-from collections import OrderedDict
-
-class SLPF(_Actuator):
-    _type = 'slpf'
-    _properties = OrderedDict([
-        ('hostname', properties.StringProperty()),
-        ('named_group', properties.StringProperty()),
-        ('asset_id', properties.StringProperty()),
-        ('asset_tuple', properties.StringProperty()),
-    ])
+#from collections import OrderedDict
 
 def CustomActuator(type='x-acme', properties=None):
     def wrapper(cls):

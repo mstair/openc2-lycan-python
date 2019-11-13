@@ -42,7 +42,9 @@ from .common import Payload
 
 from .args import Args, CustomArgs
 
-from .actuators import SLPF, CustomActuator
+from .actuators import CustomActuator
+
+from .slpf import SLPFTarget, SLPFActuator, SLPFArgs
 
 OBJ_MAP = {
     'command': Command,
@@ -66,19 +68,20 @@ OBJ_MAP_TARGET = {
     'mac_addr': MACAddress,
     'process': Process,
     'properties': Properties,
-    'uri': URI
+    'uri': URI,
+    'slpf:rule_number': SLPFTarget
 }
 
 OBJ_MAP_ACTUATOR = {
-    'slpf': SLPF
+    'slpf': SLPFActuator
 }
 
 OBJ_MAP_ARGS = {
-    'args': Args
+    'args': Args,
 }
 
 EXT_MAP = {
-    'targets': {},
-    'actuators': {},
-    'args': {}
+    'targets': {'slpf:rule_number':SLPFTarget},
+    'actuators': {'slpf': SLPFActuator},
+    'args': {'slpf':SLPFArgs}
 }

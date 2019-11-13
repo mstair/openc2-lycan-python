@@ -67,7 +67,6 @@ def dict_to_openc2(openc2_dict, allow_custom=False, version=None):
     return obj_class(allow_custom=allow_custom, **openc2_dict)
 
 def parse_component(data, allow_custom=False, version=None, component_type=None):
-
     obj = _get_dict(data)
     obj = copy.deepcopy(obj)
     try:
@@ -98,6 +97,41 @@ def parse_target(data, allow_custom=False, version=None):
 
 def parse_actuator(data, allow_custom=False, version=None):
     return parse_component(data, allow_custom, version, component_type="actuators")
+
+def parse_args(data, allow_custom=False, version=None):
+    dictified = copy.deepcopy(data)
+    default_args = list(OPENC2_OBJ_MAPS["args"]["args"]._properties.keys())
+    specific_type_map = OPENC2_OBJ_MAPS["extensions"]["args"]
+    #iterate over each key and if its not in the default args, check extensions
+    for key, subvalue in dictified.items():
+        if key in default_args:
+            continue
+        #handle embedded custom args
+        if key in specific_type_map:
+            cls = specific_type_map[key]
+            if type(subvalue) is dict:
+                if allow_custom:
+                    subvalue['allow_custom'] = True
+                    dictified[key] = cls(**subvalue)
+                else:
+                    dictified[key] = cls(**subvalue)
+            elif type(subvalue) is cls:
+                # If already an instance of an _Extension class, assume it's valid
+                dictified[key] = subvalue
+            else:
+                raise ValueError("Cannot determine extension type.")
+        else:
+            if allow_custom:
+                dictified[key] = subvalue
+            else:
+                raise CustomContentError("Can't parse unknown extension type: {}".format(key))
+    try:
+        OBJ_MAP = OPENC2_OBJ_MAPS["args"]
+        obj_class = OBJ_MAP["args"]
+    except KeyError:
+        raise CustomContentError("Can't parse args '%s!" % data) 
+
+    return obj_class(allow_custom=allow_custom, **dictified)
 
 def _register_extension(new_type, object_type, version=None):
     EXT_MAP = OPENC2_OBJ_MAPS['extensions']

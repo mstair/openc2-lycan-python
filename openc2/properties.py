@@ -33,10 +33,10 @@ from stix2 import properties
 from stix2.properties import Property, DictionaryProperty
 from stix2.utils import _get_dict
 from .base import _OpenC2Base
-from .core import parse_component
+from .core import parse_component, parse_args
 from .v10.common import Payload
 from collections import OrderedDict
-import re
+import re, inspect
 
 class PayloadProperty(Property):
     pass
@@ -90,16 +90,27 @@ class ComponentProperty(Property):
         return parsed_obj
 
 class TargetProperty(ComponentProperty):
-    def __init__(self, allow_custom=False, *args, **kwargs):
+    def __init__(self, allow_custom=True, *args, **kwargs):
         super(TargetProperty, self).__init__(allow_custom, *args, **kwargs)
         self.allow_custom = allow_custom
         self._component_type = "targets"
 
 class ActuatorProperty(ComponentProperty):
-    def __init__(self, allow_custom=False, *args, **kwargs):
+    def __init__(self, allow_custom=True, *args, **kwargs):
         super(ActuatorProperty, self).__init__(allow_custom, *args, **kwargs)
         self.allow_custom = allow_custom
         self._component_type = "actuators"
 
 class ArgsProperty(DictionaryProperty):
-    pass
+    def __init__(self, allow_custom=True, *args, **kwargs):
+        super(ArgsProperty, self).__init__(allow_custom, *args, **kwargs)
+        self.allow_custom = allow_custom
+
+    def clean(self, value):
+        dictified = {}
+        try:
+            dictified = _get_dict(value)
+        except ValueError:
+            raise ValueError("This property may only contain a dictionary or object")
+        parsed_obj = parse_args(dictified, allow_custom=self.allow_custom)
+        return parsed_obj
