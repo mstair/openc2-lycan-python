@@ -36,12 +36,14 @@ def get_version():
         raise AttributeError("Package does not have a __version__")
 
 setup(
-    name='lycan',
+    name='openc2',
     version=get_version(),
+    description='Produce and consume OpenC2 JSON messages',
     packages=find_packages(exclude=["tests"]),
     license='MIT',
     include_package_data=True,
     long_description=open('README.md').read(),
+    long_description_content_type='text/markdown',
     install_requires=[
         'six',
         'stix2'

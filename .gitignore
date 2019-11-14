@@ -3,3 +3,7 @@ __pycache__/
 build
 .coverage
 lycan.egg-info
+.DS_Store
+.AppleDouble
+.LSOverride
+*.swp

@@ -112,13 +112,13 @@ class InternationalizedEmailAddress(_Target):
     ])
 
 class IPv4Address(_Target):
-    _type = 'ipv4_net'
+    _type = 'ipv4_addr'
     _properties = OrderedDict([
         ('ipv4_net', properties.StringProperty(required=True)),
     ])
 
 class IPv6Address(_Target):
-    _type = 'ipv6_net'
+    _type = 'ipv6_addr'
     _properties = OrderedDict([
         ('ipv6_net', properties.StringProperty(required=True)),
     ])
