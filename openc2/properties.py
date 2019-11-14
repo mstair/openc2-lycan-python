@@ -49,9 +49,9 @@ class FileProperty(Property):
 
 #openc2 1.0 spec only supports md5, sha1, sha256
 HASHES_REGEX = {
-    "md5": (r"^[a-fA-F0-9]{32}$", "md5"),
-    "sha1": (r"^[a-fA-F0-9]{40}$", "sha1"),
-    "sha256": (r"^[a-fA-F0-9]{64}$", "sha256"),
+    "md5": (r"^[A-F0-9]{32}$", "md5"),
+    "sha1": (r"^[A-F0-9]{40}$", "sha1"),
+    "sha256": (r"^[A-F0-9]{64}$", "sha256"),
 }
 
 class HashesProperty(DictionaryProperty):
